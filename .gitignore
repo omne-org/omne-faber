@@ -1,0 +1,7 @@
+# Release artifacts (built by .github/workflows/release.yml)
+omne-faber-v*.tar.gz
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
