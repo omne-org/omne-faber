@@ -22,7 +22,7 @@ jobs:
         run: |
           test -d dist || { echo "ERROR: dist/ missing"; exit 1; }
           test -f dist/AGENTS.md || { echo "ERROR: dist/AGENTS.md missing"; exit 1; }
-          test -d dist/skills || { echo "ERROR: dist/skills/ missing"; exit 1; }
+          test -d dist/cmds || { echo "ERROR: dist/cmds/ missing"; exit 1; }
           test -d dist/pipes || { echo "ERROR: dist/pipes/ missing"; exit 1; }
           test -d dist/hooks || { echo "ERROR: dist/hooks/ missing"; exit 1; }
 
