@@ -1,7 +1,6 @@
 ---
 name: implement
 description: Read the feature plan and produce the source files and tests it specifies. Emit the reserved blocked sentinel on ambiguity rather than guessing.
-model: claude-opus-4-6
 allowed_tools:
   - Read
   - Grep

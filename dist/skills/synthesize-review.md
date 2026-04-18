@@ -79,8 +79,15 @@ Required sections, in order:
 - Do not modify source code.
 - Do not emit any reserved sentinel token. Exit normally after
   writing the synthesis file.
+- Do not use the verdict strings `APPROVED` or `COMPLETE`. These are
+  not reserved in kernel v1, but the kernel plan lists them for
+  post-v1 reservation. Keeping the verdict vocabulary disjoint from
+  future reserved tokens costs nothing and avoids a silent breakage
+  when the reservation lands.
 
 ## Termination
 
 Write the synthesis file. Exit. The subsequent `approve` gate in the
-pipe pauses for the human.
+pipe runs the `human-approval` hook — which in kernel v0.2.x is a
+no-op checkpoint (exits 0 immediately). The run ends `pipe.completed`
+and the human reviews the worktree manually.

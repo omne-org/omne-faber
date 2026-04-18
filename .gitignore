@@ -1,6 +1,9 @@
 # Release artifacts (built by .github/workflows/release.yml)
 omne-faber-v*.tar.gz
 
+# Local smoke-test scratch area
+.smoke/
+
 # Editor / OS
 .DS_Store
 Thumbs.db

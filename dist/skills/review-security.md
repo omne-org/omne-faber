@@ -29,9 +29,12 @@ runs concurrently; do not coordinate.
 
 ## Inputs
 
-- The feature diff. Obtain it with a bash call: `git diff` against the
-  worktree's base branch, or inspect the current branch's commits
-  since divergence. Read the diff completely.
+- The feature diff. The `implement` and `fix-loop` nodes wrote to
+  `src/` and `tests/` without committing, so run `git diff` (no arguments)
+  in the worktree to see every change. The worktree is detached-HEAD
+  (no branch, no base ref) — do not try `git diff <base>` or
+  `git log --branches`; they return nothing useful here. Use
+  `git status --short` to spot untracked new files.
 - `lib/docs/inter/plan-$OMNE_INPUT_FEATURE_NAME.md` — ground truth for
   intended behavior. Deviations from the plan are findings.
 

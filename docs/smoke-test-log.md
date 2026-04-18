@@ -46,13 +46,15 @@ Every AI node received a prompt of the form `/plan`, `/implement`, `/fix-loop` (
 
 ## Root cause (kernel)
 
-Two-part mismatch in `omne-cli` v0.2.0:
+Three-part mismatch in `omne-cli` v0.2.0, all tracked under [omne-cli#21](https://github.com/omne-org/omne-cli/issues/21):
 
-1. **Prompt format sends slash commands.** `omne-cli/src/executor.rs:324` builds AI prompts as `format!("/{command}")`. Slash commands resolve against `.claude/commands/<name>.md`.
+1. **Prompt format sends slash commands.** `omne-cli/src/executor.rs:324` builds AI prompts as `format!("/{command}")`. Slash commands resolve against `.claude/commands/<name>.md`, which the kernel never wires.
 
 2. **Skill linker only handles directory layout.** `omne-cli/src/claude_skills.rs:97` filters out non-directory entries with `if !src.is_dir() { continue; }`. File-based skills (`dist/skills/<name>.md` — the layout the kernel plan specs at line 286: *"every `command` name resolves to `dist/skills/<name>.md` or `core/skills/<name>.md`"*) are silently skipped. Even if they were linked, they land under `.claude/skills/`, not `.claude/commands/`, so `/plan` still wouldn't resolve.
 
-Net effect: a distro built to the kernel plan's specified file-based skill layout ships no usable AI nodes under v0.2.0.
+3. **AI nodes receive no omne-specific env vars.** `omne-cli/src/executor.rs:266` (`run_ai`) calls `build_spawn_opts` at line 656, which produces a `SpawnOpts` with no env-var hook; `claude_proc::spawn` forwards only inherited process env. The kernel sets `OMNE_RUN_ID` / `OMNE_VOLUME_ROOT` only for gate hooks (line 892-895) and `OMNE_INPUT_*` only for bash nodes (line 227-230). Skills that reference `$OMNE_INPUT_FEATURE_NAME` to construct handoff paths therefore get an empty string — the path `lib/docs/inter/plan-.md` would collide across concurrent features, but more importantly the skill cannot know what feature it is working on.
+
+Net effect: a distro built to the kernel plan's specified file-based skill layout ships no usable AI nodes under v0.2.0. All three gaps must close before the pipe can run.
 
 ## Faber status
 
@@ -64,9 +66,9 @@ Net effect: a distro built to the kernel plan's specified file-based skill layou
 
 Unit 6 is **deferred** pending kernel fix tracked in [omne-cli#21](https://github.com/omne-org/omne-cli/issues/21).
 
-Re-run this smoke once the kernel either:
+Re-run this smoke once the kernel:
 
-- wires file-based skills to `.claude/commands/<name>.md`, or
-- changes the `command:` prompt form to invoke the Skill tool / embed skill bodies directly (removing the slash-command dependency).
+- wires file-based skills to `.claude/commands/<name>.md` (or changes the `command:` prompt form to embed skill bodies directly), AND
+- injects `OMNE_INPUT_*` + `OMNE_RUN_ID` + `OMNE_VOLUME_ROOT` into AI node subprocesses the way it already does for bash nodes and gate hooks.
 
-No changes are needed to `omne-faber` v2.0.0 to unblock this once the kernel ships a fix.
+When the kernel patch lands, faber tags v2.0.1 with the content fixes from this review (hook no-op semantics, README requirement bump, removed dead frontmatter, detached-worktree git-diff correction).

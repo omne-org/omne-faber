@@ -30,8 +30,11 @@ runs concurrently; do not coordinate.
 
 ## Inputs
 
-- The feature diff. Obtain it with a bash call: `git diff` against the
-  worktree's base branch. Read it completely.
+- The feature diff. The `implement` and `fix-loop` nodes wrote to
+  `src/` and `tests/` without committing, so run `git diff` (no arguments)
+  in the worktree. The worktree is detached-HEAD — `git diff <base>` and
+  branch-ref commands return nothing useful. Use `git status --short`
+  for untracked files.
 - `lib/docs/inter/plan-$OMNE_INPUT_FEATURE_NAME.md` — scenario list
   and file list. Deviations are findings.
 - `tests/` — the actual encoded scenarios. A scenario in the plan

@@ -39,8 +39,12 @@ Software-engineering workflow distro for omne. Drives features end-to-end — pl
 
 **Sentinels used by this distro.** `fix-loop` terminates on the reserved `ALL_TASKS_COMPLETE` token. Any skill may emit `BLOCKED` as a complete line to abort on ambiguity or missing preconditions. Both tokens are kernel-reserved — this distro does not define its own.
 
-**Gates.** The `feature` pipe's `approve` node registers the `human-approval` gate, which runs `dist/hooks/human-approval.ps1` (Windows) or `dist/hooks/human-approval.sh` (Linux/Mac). The hook exits non-zero to mark the gate pending; the operator releases it with `omne signal <run_id> human-approval`.
+**Gates.** The `feature` pipe's `approve` node registers the `human-approval` gate, which runs `dist/hooks/human-approval.ps1` (Windows) or `dist/hooks/human-approval.sh` (Linux/Mac). In v1 the hook exits 0 as a no-op checkpoint — kernel v0.2.x has no `omne signal` verb (deferred post-v1), so "real parking" is not available. The human reviews the worktree outside omne and merges manually. A future kernel release is expected to add signal-based parking; the distro will update when it lands.
 
-**Environment contract.** The kernel injects the following variables into every node subprocess: `OMNE_RUN_ID`, `OMNE_NODE_ID`, `OMNE_GATE_NAME`, `OMNE_VOLUME_ROOT`, and any `OMNE_INPUT_*` keys set on the run. Skills read these rather than parsing paths or prompting for context.
+**Environment contract.** The kernel injects environment variables non-uniformly across node kinds in v0.2.x:
+
+- **Gate hooks** receive `OMNE_RUN_ID`, `OMNE_NODE_ID`, `OMNE_GATE_NAME`, `OMNE_VOLUME_ROOT`.
+- **Bash nodes** receive `OMNE_INPUT_*` keys set on the run.
+- **AI nodes (skill invocations)** currently receive **no omne-specific env vars** in v0.2.x — the kernel does not forward `OMNE_INPUT_*` or volume-root vars into the `claude -p` subprocess. Tracked as an upstream gap; skill bodies that reference `$OMNE_INPUT_FEATURE_NAME` are written in anticipation of the kernel fix and do not resolve on v0.2.x.
 
 @.omne/core/skills/omne.md
