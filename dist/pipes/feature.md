@@ -97,4 +97,4 @@ From inside Claude Code, dispatch through the Bash tool with `run_in_background:
 
 **`fresh_context: true` is the only form available.** Kernel v1 defers the `claude --resume` session-resume story (see Unit 0 spike in the kernel plan). Until the spike unblocks `fresh_context: false`, the validator rejects it. Each iteration of `fix-loop` therefore starts from a clean session and must re-read whatever state it needs from the worktree; the `fix-loop` skill is written with that assumption.
 
-**Schema deltas from pre-v2.** This pipe uses `command:` references into `dist/skills/` and a flat DAG. The old `agent:`, `advances_stage:`, `covers_stages:`, and `stages` vocabulary are rejected by the v2 schema and do not appear here.
+**Schema deltas from pre-v2.** This pipe uses `command:` references into `dist/cmds/` and a flat DAG. The old `agent:`, `advances_stage:`, `covers_stages:`, and `stages` vocabulary are rejected by the v2 schema and do not appear here.
